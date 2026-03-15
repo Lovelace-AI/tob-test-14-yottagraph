@@ -1,7 +1,7 @@
 import { defineFeatureModule } from '~/composables/useModuleRegistry';
 
 export default defineFeatureModule({
-    id: 'company-watchlist',
+    id: 'watchlist',
     name: 'Company Watchlist',
     icon: 'mdi-briefcase-eye',
     description: 'Track companies and browse their SEC EDGAR filings',
@@ -12,11 +12,6 @@ export default defineFeatureModule({
             component: () => import('./pages/index.vue'),
         },
     ],
-
-    navigation: {
-        title: 'Watchlist',
-        order: 10,
-    },
 
     requires: [],
     provides: ['useWatchlist', 'useEdgarApi'],

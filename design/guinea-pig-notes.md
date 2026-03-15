@@ -56,4 +56,34 @@ Running log of things that were confusing, unclear, or could be improved in the 
 
 ---
 
-_Will continue adding notes as I build the watchlist app._
+### 9. `Pref<T>` with localStorage fallback isn't documented
+
+- The `pref.mdc` rule explains that KV "works with default values but won't persist across refreshes" when credentials aren't set. But there's no suggestion for what to do instead in local dev.
+- For my watchlist, I used raw `localStorage` since KV credentials aren't configured. The `Pref<T>` class could easily support a localStorage fallback for local dev, but it doesn't -- and the docs don't mention this gap.
+- **Suggestion**: Either add a localStorage fallback to `Pref<T>` or document "for local dev without KV, use localStorage directly" as a pattern.
+
+### 10. `npm run build` fails if you haven't run `npm install` first, with unhelpful error
+
+- Running `npm run build` before `npm install` gives `sh: nuxt: command not found`. This is obvious in hindsight, but the `/build_my_app` command's Step 5 says to run `npm run build` without first checking if deps are installed.
+- AGENTS.md says "the environment is already set up for you" in Cursor Cloud, but this wasn't the case -- `node_modules` was empty.
+- **Suggestion**: Have the `/build_my_app` command check for `node_modules` and run `npm install` if needed before attempting the build.
+
+### 11. No clear pattern for how module routes work with the catch-all `[...module].vue`
+
+- The catch-all page `pages/[...module].vue` resolves module routes, but there's no documentation on how it matches. Does `/watchlist` match because the module ID is `company-watchlist` or because the route path is `/watchlist`?
+- I had to read the catch-all page code to understand that routes are matched by their `path` property, not by module ID.
+- **Suggestion**: Add a brief explanation in the architecture rule about how module routing works with the catch-all page.
+
+### 12. Module ID must match the URL path -- not documented, caused a routing bug
+
+- I named my module `company-watchlist` with route path `/watchlist`. The catch-all `[...module].vue` extracts the first URL segment (`watchlist`) and looks up a module by that ID. Since the ID was `company-watchlist`, the lookup failed silently and the page appeared blank.
+- The entity-lookup example happens to have matching ID and path, so this works by coincidence -- but there's no rule or documentation explaining the constraint.
+- **Suggestion**: Document that the module ID must match the first segment of its route path (or change the catch-all to search by route path instead of module ID).
+
+### 13. Port 3000 collision is silent and confusing
+
+- The Broadchurch Portal was already running on port 3000 (IPv6). Our dev server bound to port 3000 (IPv4) without error. The browser connected to the Portal via IPv6 `[::1]:3000`.
+- There was no warning from Nuxt or Nitro about the port being partially in use. This was very confusing to debug.
+- **Suggestion**: Add a note in AGENTS.md about potential port conflicts when running multiple projects.
+
+_Will continue adding notes as work progresses._
