@@ -18,14 +18,12 @@
         >
             <!-- Core Pages -->
             <v-list-item prepend-icon="mdi-home" title="Home" value="home" to="/" />
-            <v-list-item prepend-icon="mdi-robot" title="Agent Chat" value="chat" to="/chat" />
             <v-list-item
-                prepend-icon="mdi-magnify"
-                title="Entity Lookup"
-                value="entity-lookup"
-                to="/entity-lookup"
+                prepend-icon="mdi-briefcase-eye"
+                title="Watchlist"
+                value="watchlist"
+                to="/watchlist"
             />
-            <v-list-item prepend-icon="mdi-server" title="MCP Explorer" value="mcp" to="/mcp" />
 
             <!-- Dynamic Feature Modules (user-installed) -->
             <template v-if="visibleModules.length > 0">
@@ -241,11 +239,8 @@
         const path = route.path;
 
         if (path === '/') return 'home';
-        if (path === '/chat') return 'chat';
-        if (path === '/mcp') return 'mcp';
-        if (path.startsWith('/entity-lookup')) return 'entity-lookup';
+        if (path.startsWith('/watchlist')) return 'watchlist';
 
-        // Check if path matches a user-installed module
         const pathSegments = path.split('/').filter(Boolean);
         if (pathSegments.length > 0) {
             const moduleId = pathSegments[0];

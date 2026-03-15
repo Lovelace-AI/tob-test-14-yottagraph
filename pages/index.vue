@@ -1,104 +1,80 @@
 <template>
     <div class="home-page">
         <div class="home-content">
-            <!-- Hero Section -->
             <div class="hero-section">
-                <img src="/LL-logo-full-wht.svg" alt="Lovelace" class="hero-logo" />
-                <h1 class="hero-title">{{ appName || 'Welcome to Aether' }}</h1>
-                <p class="hero-subtitle">Your AI-powered workspace is ready.</p>
+                <v-icon size="48" color="primary" class="mb-4">mdi-briefcase-eye</v-icon>
+                <h1 class="hero-title">{{ appName || 'EDGAR Watchlist' }}</h1>
+                <p class="hero-subtitle">
+                    Track companies and browse their SEC filings in one place.
+                </p>
             </div>
 
-            <!-- Quick Actions -->
             <div class="actions-grid">
-                <v-card
-                    class="action-card"
-                    to="/chat"
-                    hover
-                    :style="{ borderColor: 'rgba(63, 234, 0, 0.3)' }"
-                >
+                <v-card class="action-card" to="/watchlist" hover>
                     <div class="action-icon-wrap" style="background: rgba(63, 234, 0, 0.1)">
-                        <v-icon size="32" color="primary">mdi-robot</v-icon>
+                        <v-icon size="32" color="primary">mdi-format-list-bulleted</v-icon>
                     </div>
                     <div class="action-text">
-                        <div class="action-title">Agent Chat</div>
-                        <div class="action-desc">
-                            Talk to your deployed AI agents. Ask questions, run tasks, and get
-                            answers in real time.
+                        <div class="action-title">
+                            Your Watchlist
+                            <v-chip
+                                v-if="count > 0"
+                                size="x-small"
+                                color="primary"
+                                variant="tonal"
+                                class="ml-2"
+                            >
+                                {{ count }}
+                            </v-chip>
                         </div>
-                    </div>
-                    <v-icon class="action-arrow" size="20">mdi-arrow-right</v-icon>
-                </v-card>
-
-                <v-card class="action-card" to="/entity-lookup" hover>
-                    <div class="action-icon-wrap" style="background: rgba(0, 59, 255, 0.1)">
-                        <v-icon size="32" color="secondary">mdi-magnify</v-icon>
-                    </div>
-                    <div class="action-text">
-                        <div class="action-title">Entity Lookup</div>
                         <div class="action-desc">
-                            Search the Query Server for named entities. Look up people,
-                            organizations, and more.
-                        </div>
-                    </div>
-                    <v-icon class="action-arrow" size="20">mdi-arrow-right</v-icon>
-                </v-card>
-
-                <v-card class="action-card" to="/mcp" hover>
-                    <div class="action-icon-wrap" style="background: rgba(255, 92, 0, 0.1)">
-                        <v-icon size="32" color="warning">mdi-server</v-icon>
-                    </div>
-                    <div class="action-text">
-                        <div class="action-title">MCP Explorer</div>
-                        <div class="action-desc">
-                            Browse and test MCP server tools. Discover capabilities and run tools
-                            interactively.
+                            {{
+                                count > 0
+                                    ? `You're tracking ${count} ${count === 1 ? 'company' : 'companies'}. Click to view filings.`
+                                    : 'Add companies to start tracking their SEC EDGAR filings.'
+                            }}
                         </div>
                     </div>
                     <v-icon class="action-arrow" size="20">mdi-arrow-right</v-icon>
                 </v-card>
             </div>
 
-            <!-- Getting Started -->
-            <div class="getting-started">
-                <h2 class="section-title">Getting Started</h2>
+            <div class="info-section">
+                <h2 class="section-title">What You Can Do</h2>
                 <div class="steps-grid">
                     <div class="step-item">
-                        <span class="step-number">1</span>
+                        <v-icon color="primary" class="mr-3">mdi-magnify</v-icon>
                         <div>
-                            <div class="step-title">Deploy an Agent</div>
+                            <div class="step-title">Search Companies</div>
                             <div class="step-desc">
-                                Create a Python ADK agent in <code>agents/</code> and run
-                                <code>/deploy_agent</code> to ship it to Vertex AI.
+                                Find any public company by name, ticker symbol, or CIK number.
                             </div>
                         </div>
                     </div>
                     <div class="step-item">
-                        <span class="step-number">2</span>
+                        <v-icon color="primary" class="mr-3">mdi-eye-plus</v-icon>
                         <div>
-                            <div class="step-title">Chat with your Agent</div>
+                            <div class="step-title">Build Your Watchlist</div>
                             <div class="step-desc">
-                                Open Agent Chat to interact with your deployed agents through the
-                                Portal Gateway.
+                                Curate a personal list of companies you want to monitor.
                             </div>
                         </div>
                     </div>
                     <div class="step-item">
-                        <span class="step-number">3</span>
+                        <v-icon color="primary" class="mr-3">mdi-file-document-multiple</v-icon>
                         <div>
-                            <div class="step-title">Build a Feature</div>
+                            <div class="step-title">Browse Filings</div>
                             <div class="step-desc">
-                                Copy <code>templates/feature-template/</code> to
-                                <code>features/</code> and create your own module.
+                                View 10-Ks, 10-Qs, 8-Ks, and all other EDGAR filings with one click.
                             </div>
                         </div>
                     </div>
                     <div class="step-item">
-                        <span class="step-number">4</span>
+                        <v-icon color="primary" class="mr-3">mdi-filter</v-icon>
                         <div>
-                            <div class="step-title">Deploy MCP Servers</div>
+                            <div class="step-title">Filter by Type</div>
                             <div class="step-desc">
-                                Add tools for your agents with FastMCP servers in
-                                <code>mcp-servers/</code>. Run <code>/deploy_mcp</code> to deploy.
+                                Narrow down filings to specific form types to find what matters.
                             </div>
                         </div>
                     </div>
@@ -109,7 +85,10 @@
 </template>
 
 <script setup lang="ts">
+    import { useWatchlist } from '~/features/company-watchlist/composables/useWatchlist';
+
     const { appName } = useAppInfo();
+    const { count } = useWatchlist();
 </script>
 
 <style scoped>
@@ -126,17 +105,9 @@
         width: 100%;
     }
 
-    /* Hero */
     .hero-section {
         text-align: center;
         margin-bottom: 48px;
-    }
-
-    .hero-logo {
-        height: 2rem;
-        width: auto;
-        margin-bottom: 24px;
-        opacity: 0.6;
     }
 
     .hero-title {
@@ -152,7 +123,6 @@
         font-size: 1.1rem;
     }
 
-    /* Action Cards */
     .actions-grid {
         display: flex;
         flex-direction: column;
@@ -191,6 +161,8 @@
         font-size: 1.05rem;
         letter-spacing: 0.02em;
         margin-bottom: 4px;
+        display: flex;
+        align-items: center;
     }
 
     .action-desc {
@@ -209,8 +181,7 @@
         opacity: 0.8;
     }
 
-    /* Getting Started */
-    .getting-started {
+    .info-section {
         margin-bottom: 48px;
     }
 
@@ -232,24 +203,7 @@
 
     .step-item {
         display: flex;
-        gap: 16px;
         align-items: flex-start;
-    }
-
-    .step-number {
-        flex-shrink: 0;
-        width: 28px;
-        height: 28px;
-        border-radius: 50%;
-        background: var(--lv-surface);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-family: var(--font-mono);
-        font-size: 0.8rem;
-        color: var(--lv-green);
-        margin-top: 2px;
     }
 
     .step-title {
@@ -261,10 +215,5 @@
         color: var(--lv-silver);
         font-size: 0.875rem;
         line-height: 1.4;
-    }
-
-    .step-desc code {
-        font-size: 0.85em;
-        padding: 1px 5px;
     }
 </style>

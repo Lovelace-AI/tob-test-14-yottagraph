@@ -13,7 +13,7 @@ import { useModuleLoader } from '~/composables/useModuleLoader';
 import { initializeModuleApi } from '~/composables/useModuleApi';
 
 // Import all built-in feature modules
-import entityLookup from '~/features/entity-lookup';
+import companyWatchlist from '~/features/company-watchlist';
 
 export default defineNuxtPlugin(async () => {
     // Initialize the module API first, before any modules load
@@ -23,10 +23,8 @@ export default defineNuxtPlugin(async () => {
     // Get the module registry
     const moduleRegistry = useModuleRegistry();
 
-    // Register built-in modules.
-    // Entity Lookup appears in the sidebar via hardcoded core pages, not via
-    // the dynamic Features section, so its navigation property is omitted.
-    moduleRegistry.register(entityLookup);
+    // Register built-in modules
+    moduleRegistry.register(companyWatchlist);
 
     console.log(
         '[Module Registry Plugin] Registered built-in modules:',
