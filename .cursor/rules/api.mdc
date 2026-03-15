@@ -1,0 +1,82 @@
+---
+description: Apply when writing code that calls the Elemental API, useElementalClient, any API endpoints to access data.
+alwaysApply: false
+---
+# Elemental API
+
+The Elemental API provides access to the Lovelace Knowledge Graph through
+the Query Server. Use it to search for entities, retrieve properties,
+explore relationships, and analyze sentiment.
+
+## Skill Documentation
+
+For full endpoint documentation, read the **elemental-api skill** in
+`.cursor/skills/elemental-api/`. Start with `SKILL.md`, then `overview.md`.
+
+Key files:
+- `entities.md` — entity search, details, and properties
+- `find.md` — expression language for searching by type, property, and relationships
+- `schema.md` — entity types (flavors), properties (PIDs), and schema endpoints
+- `relationships.md` — entity connections
+- `events.md` — events involving entities
+- `articles.md` — news mentions and article content
+
+## Client Usage
+
+All API calls go through `useElementalClient()` from `@yottagraph-app/elemental-api/client`.
+Auth tokens and base URL are configured automatically by the `elemental-client` plugin.
+
+```typescript
+import { useElementalClient } from '@yottagraph-app/elemental-api/client';
+
+const client = useElementalClient();
+
+const results = await client.getNEID({ entityName: 'Apple', maxResults: 5 });
+const report = await client.getNamedEntityReport(results.neids[0]);
+const schema = await client.getSchema();
+```
+
+Types are also imported from the client:
+
+```typescript
+import type { NamedEntityReport, GetNEIDResponse } from '@yottagraph-app/elemental-api/client';
+```
+
+## Discovery-First Pattern
+
+The knowledge graph contains many entity types and properties, and new datasets
+are added regularly (e.g. Edgar filings, shipping data). Do NOT hardcode entity
+types or property names. Instead, discover them at runtime:
+
+1. **Get the schema** — `client.getSchema()` returns all entity types (flavors)
+   and properties (PIDs) available in the system. See `schema.md`.
+2. **Search with expressions** — `client.findEntities()` uses a JSON expression
+   language to search by type, property value, or relationship. See `find.md`.
+3. **Get property values** — `client.getPropertyValues()` fetches property data
+   for specific entities. Properties with type `data_nindex` are entity IDs
+   that can be resolved with another `getPropertyValues` call.
+
+This pattern lets agents work with any dataset without needing hardcoded
+knowledge of what's in the graph.
+
+## Error Handling
+
+```typescript
+try {
+    const data = await client.getNEID({ entityName: '...' });
+} catch (error) {
+    console.error('API Error:', error);
+    showError('Failed to load data. Please try again.');
+}
+```
+
+Methods on `useElementalClient()` return data directly and throw on non-2xx
+responses. For full `{ data, status, headers }` access, import the raw
+functions instead:
+
+```typescript
+import { getArticle } from '@yottagraph-app/elemental-api/client';
+
+const response = await getArticle(artid);
+if (response.status === 404) { /* handle not found */ }
+```
